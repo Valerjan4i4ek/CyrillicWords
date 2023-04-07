@@ -23,9 +23,10 @@ public class Task implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Parsing" + link);
         returnCyrillicWords();
     }
-    public WordsAndLinks getURLData() throws IOException {
+    public synchronized WordsAndLinks getURLData() throws IOException {
         URL urlObject = new URL(link);
         HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
         connection.setRequestMethod("GET");
@@ -46,7 +47,7 @@ public class Task implements Runnable {
         in.close();
         return wordsAndLinks;
     }
-    public List<WordsAndLinks> parsingCyrillicWords() throws IOException{
+    public synchronized List<WordsAndLinks> parsingCyrillicWords() throws IOException{
         WordsAndLinks wordsAndLinks = getURLData();
         List<WordsAndLinks> returnList = new LinkedList<>();
 
@@ -75,7 +76,7 @@ public class Task implements Runnable {
 
         return returnList;
     }
-    public void addWords(StringBuffer stringBuffer, String link){
+    public synchronized void addWords(StringBuffer stringBuffer, String link){
         String word = stringBuffer.toString().toLowerCase();
         String[] words = word.split(" ");
         Words wordAddToDatabaseAndCache;

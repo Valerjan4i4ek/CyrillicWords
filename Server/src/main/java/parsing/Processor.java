@@ -31,6 +31,7 @@ public class Processor implements Runnable{
     private WordsCache wordsCache;
     ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
     Task task;
+    List<String> removeList = new LinkedList<>();
     public Processor(WordsCache wordsCache) {
         this.wordsCache = wordsCache;
     }
@@ -51,8 +52,8 @@ public class Processor implements Runnable{
                             task = new Task(link, wordsCache);
                             executorService.submit(task);
                             count++;
+                            removeList.add(link);
                         }
-                        LIST_LINKS.remove(count);
 
                     }
                 }
@@ -60,9 +61,10 @@ public class Processor implements Runnable{
                     for(String link : LIST_LINKS){
                         task = new Task(link, wordsCache);
                         executorService.submit(task);
+                        removeList.add(link);
                     }
-                    LIST_LINKS.clear();
                 }
+                LIST_LINKS.removeAll(removeList);
             }
         }
 
