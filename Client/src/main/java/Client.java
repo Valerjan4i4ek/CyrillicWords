@@ -36,7 +36,9 @@ public class Client {
         getLinkByWord(word);
     }
     public static void parsingWords() throws RemoteException {
-        wordsParsing.parsingWords();
+        for(String link : LIST_LINKS){
+            wordsParsing.parsingWords(link);
+        }
     }
     public static void getLinkByWord(String word) throws RemoteException{
         for(Words words : wordsParsing.getLinkByWord(word)){
