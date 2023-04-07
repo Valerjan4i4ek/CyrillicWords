@@ -1,3 +1,5 @@
+package models;
+
 import java.io.Serializable;
 
 public class Words implements Serializable, Comparable<Words> {
@@ -36,7 +38,7 @@ public class Words implements Serializable, Comparable<Words> {
 
     @Override
     public String toString() {
-        return "Words{" +
+        return "models.Words{" +
                 "id=" + id +
                 ", wordName='" + wordName + '\'' +
                 ", wordCount=" + wordCount +

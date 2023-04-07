@@ -1,3 +1,5 @@
+package models;
+
 public class WordsAndLinks {
     private String link;
     private StringBuffer stringBuffer;
