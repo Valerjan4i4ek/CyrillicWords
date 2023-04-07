@@ -5,6 +5,7 @@ import cacheAndDB.WordsCache;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -26,7 +27,7 @@ public class Processor implements Runnable{
             System.err.println("ОШИБКА: Файл свойств отсуствует!");
         }
     }
-    private List<String> LIST_LINKS = new ArrayList<>();
+    private List<String> LIST_LINKS = new LinkedList<>();
     private WordsCache wordsCache;
     ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
     Task task;
@@ -43,11 +44,25 @@ public class Processor implements Runnable{
                 throw new RuntimeException(e);
             }
             if(!LIST_LINKS.isEmpty()){
-                for(String link : LIST_LINKS){
-                    task = new Task(link, wordsCache);
-                    executorService.submit(task);
+                if(LIST_LINKS.size() > nThreads){
+                    int count = 0;
+                    while (count < nThreads){
+                        for(String link : LIST_LINKS){
+                            task = new Task(link, wordsCache);
+                            executorService.submit(task);
+                            count++;
+                        }
+                        LIST_LINKS.remove(count);
+
+                    }
                 }
-                LIST_LINKS.clear();
+                else{
+                    for(String link : LIST_LINKS){
+                        task = new Task(link, wordsCache);
+                        executorService.submit(task);
+                    }
+                    LIST_LINKS.clear();
+                }
             }
         }
 

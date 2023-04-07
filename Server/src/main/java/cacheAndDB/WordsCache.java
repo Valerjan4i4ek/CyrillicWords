@@ -11,7 +11,7 @@ public class WordsCache {
     List<Words> wordsCache = new ArrayList<>();
     public void addCacheAndDB(Words words){
         wordsCache.add(words);
-        sql.addWords(words);
+//        sql.addWords(words);
     }
     public void replaceCacheAndDB(Words words){
         int index = 0;
@@ -22,7 +22,7 @@ public class WordsCache {
         }
         wordsCache.remove(index);
         wordsCache.add(words);
-        sql.replaceWord(words);
+//        sql.replaceWord(words);
     }
     public Words getWordsCache(String word){
         for(Words words : wordsCache){
