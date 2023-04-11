@@ -4,12 +4,11 @@ import cacheAndDB.WordsCache;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class Processor implements Runnable{
     private final static String fileName = "Server/src/main/resources/database.properties";
@@ -28,6 +27,7 @@ public class Processor implements Runnable{
         }
     }
     private List<String> LIST_LINKS = new LinkedList<>();
+    BlockingDeque<String> BLOCKING_DEQUEUE_LINKS = new LinkedBlockingDeque<>();
     private WordsCache wordsCache;
     ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
     Task task;
@@ -44,32 +44,55 @@ public class Processor implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            if(!LIST_LINKS.isEmpty()){
-                if(LIST_LINKS.size() > nThreads){
+
+            if(!BLOCKING_DEQUEUE_LINKS.isEmpty()){
+                if(BLOCKING_DEQUEUE_LINKS.size() > nThreads){
                     int count = 0;
                     while (count < nThreads){
-                        for(String link : LIST_LINKS){
-                            task = new Task(link, wordsCache);
-                            executorService.submit(task);
-                            count++;
-                            removeList.add(link);
-                        }
-
+                        task = new Task(BLOCKING_DEQUEUE_LINKS.poll(), wordsCache);
+                        executorService.submit(task);
+                        count++;
                     }
                 }
                 else{
-                    for(String link : LIST_LINKS){
-                        task = new Task(link, wordsCache);
-                        executorService.submit(task);
-                        removeList.add(link);
-                    }
+                    task = new Task(BLOCKING_DEQUEUE_LINKS.poll(), wordsCache);
+                    executorService.submit(task);
                 }
-                LIST_LINKS.removeAll(removeList);
             }
+
+//            if(!LIST_LINKS.isEmpty()){
+//                if(LIST_LINKS.size() > nThreads){
+//                    Iterator<String> iterator = LIST_LINKS.listIterator();
+//                    while (iterator.hasNext()){
+//                        task = new Task(iterator.next(), wordsCache);
+//                        executorService.submit(task);
+//                        LIST_LINKS.remove(iterator.next());
+//                        removeList.add(iterator.next());
+//                    }
+//                    int count = 0;
+//                    while (count < nThreads){
+//                        for(String link : LIST_LINKS){
+//                            task = new Task(link, wordsCache);
+//                            executorService.submit(task);
+//                            count++;
+//                            removeList.add(link);
+//                        }
+//                    }
+//                }
+//                else{
+//                    for(String link : LIST_LINKS){
+//                        task = new Task(link, wordsCache);
+//                        executorService.submit(task);
+//                        removeList.add(link);
+//                    }
+//                }
+//                LIST_LINKS.removeAll(removeList);
+//            }
         }
 
     }
     public void addLink(String link){
-        LIST_LINKS.add(link);
+        BLOCKING_DEQUEUE_LINKS.add(link);
+//        LIST_LINKS.add(link);
     }
 }
